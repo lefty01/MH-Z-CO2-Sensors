@@ -1,4 +1,3 @@
-#include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>
 #include <MHZ.h>
 
@@ -9,7 +8,7 @@
 #define MH_Z19_RX D4  // D7
 #define MH_Z19_TX D0  // D6
 
-MHZ co2(MH_Z19_RX, MH_Z19_TX, CO2_IN, MHZ19B);
+MHZ co2(MH_Z19_RX, MH_Z19_TX, CO2_IN, MHZ::MHZ19B);
 
 void setup() {
   Serial.begin(9600);

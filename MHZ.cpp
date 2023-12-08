@@ -6,7 +6,7 @@
 #include "MHZ.h"
 
 uint8_t sPwmPin = 5;
-int sRange = MHZ::RANGE_5K;
+int sRange = MHZSensor::RANGE_5K;
 unsigned long sHighStartsMillis, sLowStartsMillis, sTl, sTh, sLastPwmPpm = 0;
 Stream* sConsole;
 
@@ -43,7 +43,7 @@ void IRAM_ATTR pulseInInterruptHandler() {
   }
 }
 
-MHZ::MHZ(uint8_t rxpin, uint8_t txpin, uint8_t pwmpin, SensorType type, MeasuringRange range) {
+MHZSensor::MHZSensor(uint8_t rxpin, uint8_t txpin, uint8_t pwmpin, SensorType type, MeasuringRange range) {
   SoftwareSerial* ss = new SoftwareSerial(rxpin, txpin);
   _pwmpin = pwmpin;
   sPwmPin = pwmpin;
@@ -55,7 +55,7 @@ MHZ::MHZ(uint8_t rxpin, uint8_t txpin, uint8_t pwmpin, SensorType type, Measurin
   _serial = ss;
 }
 
-MHZ::MHZ(uint8_t rxpin, uint8_t txpin, SensorType type) {
+MHZSensor::MHZSensor(uint8_t rxpin, uint8_t txpin, SensorType type) {
   SoftwareSerial* ss = new SoftwareSerial(rxpin, txpin);
   _type = type;
 
@@ -63,7 +63,7 @@ MHZ::MHZ(uint8_t rxpin, uint8_t txpin, SensorType type) {
   _serial = ss;
 }
 
-MHZ::MHZ(uint8_t pwmpin, SensorType type, MeasuringRange range) {
+MHZSensor::MHZSensor(uint8_t pwmpin, SensorType type, MeasuringRange range) {
   _pwmpin = pwmpin;
   sPwmPin = pwmpin;
   sRange = range;
@@ -71,7 +71,7 @@ MHZ::MHZ(uint8_t pwmpin, SensorType type, MeasuringRange range) {
   _range = range;
 }
 
-MHZ::MHZ(Stream* serial, uint8_t pwmpin, SensorType type, MeasuringRange range) {
+MHZSensor::MHZSensor(Stream* serial, uint8_t pwmpin, SensorType type, MeasuringRange range) {
   _serial = serial;
   _pwmpin = pwmpin;
   sPwmPin = pwmpin;
@@ -80,19 +80,19 @@ MHZ::MHZ(Stream* serial, uint8_t pwmpin, SensorType type, MeasuringRange range) 
   _range = range;
 }
 
-MHZ::MHZ(Stream* serial, SensorType type) {
+MHZSensor::MHZSensor(Stream* serial, SensorType type) {
   _serial = serial;
   _type = type;
 }
 
-void MHZ::activateAsyncUARTReading() {
+void MHZSensor::activateAsyncUARTReading() {
   attachInterrupt(digitalPinToInterrupt(sPwmPin), pulseInInterruptHandler, CHANGE);
 }
 
 /**
  * Enables or disables the debug mode (more logging).
  */
-void MHZ::setDebug(boolean enable, Stream* console) {
+void MHZSensor::setDebug(boolean enable, Stream* console) {
   debug = enable;
   _console = console;
   sConsole = console;
@@ -103,7 +103,7 @@ void MHZ::setDebug(boolean enable, Stream* console) {
   }
 }
 
-boolean MHZ::isPreHeating() {
+boolean MHZSensor::isPreHeating() {
   if (_isBypassPreheatingCheck) {
     return false;
   } else if (_type == MHZ14A) {
@@ -128,7 +128,7 @@ boolean MHZ::isPreHeating() {
   }
 }
 
-boolean MHZ::isReady() {
+boolean MHZSensor::isReady() {
   if (isPreHeating()) {
     return false;
   } else if (_isBypassResponseTimeCheck) {
@@ -157,7 +157,7 @@ boolean MHZ::isReady() {
   }
 }
 
-int MHZ::readCO2UART() {
+int MHZSensor::readCO2UART() {
   if (_serial == NULL) {
     if (debug) _console->println(F("-- serial is not configured"));
     return STATUS_SERIAL_NOT_CONFIGURED;
@@ -275,7 +275,7 @@ int MHZ::readCO2UART() {
   return ppm_uart;
 }
 
-int MHZ::getLastTemperature() {
+int MHZSensor::getLastTemperature() {
   if (_serial == NULL) {
     if (debug) _console->println(F("-- serial is not configured"));
     return STATUS_SERIAL_NOT_CONFIGURED;
@@ -284,16 +284,16 @@ int MHZ::getLastTemperature() {
   return temperature;
 }
 
-void MHZ::setTemperatureOffset(uint8_t offset) { _temperatureOffset = offset; }
+void MHZSensor::setTemperatureOffset(uint8_t offset) { _temperatureOffset = offset; }
 
-void MHZ::setBypassCheck(boolean isBypassPreheatingCheck, boolean isBypassResponseTimeCheck) {
+void MHZSensor::setBypassCheck(boolean isBypassPreheatingCheck, boolean isBypassResponseTimeCheck) {
   _isBypassPreheatingCheck = isBypassPreheatingCheck;
   _isBypassResponseTimeCheck = isBypassResponseTimeCheck;
 }
 
-int MHZ::getLastCO2() { return sLastPwmPpm; }
+int MHZSensor::getLastCO2() { return sLastPwmPpm; }
 
-byte MHZ::getCheckSum(byte* packet) {
+byte MHZSensor::getCheckSum(byte* packet) {
   if (_serial == NULL) {
     if (debug) _console->println(F("-- serial is not configured"));
     return STATUS_SERIAL_NOT_CONFIGURED;
@@ -309,7 +309,7 @@ byte MHZ::getCheckSum(byte* packet) {
   return checksum;
 }
 
-int MHZ::readCO2PWM() {
+int MHZSensor::readCO2PWM() {
   if (_pwmpin == UNUSED_PIN) {
     if (debug) _console->println(F("-- pwm is not configured "));
     return STATUS_PWM_NOT_CONFIGURED;
@@ -334,7 +334,7 @@ int MHZ::readCO2PWM() {
   return ppm_pwm;
 }
 
-void MHZ::setAutoCalibrate(boolean b)  // only available for MHZ-19B with firmware < 1.6, MHZ-19C and MHZ 14a
+void MHZSensor::setAutoCalibrate(boolean b)  // only available for MHZ-19B with firmware < 1.6, MHZ-19C and MHZ 14a
 {
   uint8_t cmd_enableAutoCal[9] = {0xFF, 0x01, 0x79, 0xA0, 0x00, 0x00, 0x00, 0x00, 0xE6};
   uint8_t cmd_disableAutoCal[9] = {0xFF, 0x01, 0x79, 0x00, 0x00, 0x00, 0x00, 0x00, 0x86};
@@ -345,7 +345,7 @@ void MHZ::setAutoCalibrate(boolean b)  // only available for MHZ-19B with firmwa
   }
 }
 
-void MHZ::setRange(int range)  // only available for MHZ-19B < 1.6 and MH-Z 14a
+void MHZSensor::setRange(int range)  // only available for MHZ-19B < 1.6 and MH-Z 14a
 {
   uint8_t cmd_2K[9] = {0xFF, 0x01, 0x99, 0x00, 0x00, 0x00, 0x07, 0xD0, 0x8F};
   uint8_t cmd_5K[9] = {0xFF, 0x01, 0x99, 0x00, 0x00, 0x00, 0x13, 0x88, 0xCB};
@@ -363,7 +363,7 @@ void MHZ::setRange(int range)  // only available for MHZ-19B < 1.6 and MH-Z 14a
   }
 }
 
-void MHZ::calibrateZero() {
+void MHZSensor::calibrateZero() {
   uint8_t cmd[9] = {0xFF, 0x01, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x78};
   _serial->write(cmd, 9);
 }
@@ -371,7 +371,7 @@ void MHZ::calibrateZero() {
 /***** calibrateSpan() function for professional use. requires a constant atmosphere with 2K, 5k or 10k ppm CO2 and
 calibrateZero at first.
 
-void MHZ::calibrateSpan(int range)
+void MHZSensor::calibrateSpan(int range)
 {
     char cmd_2K[9] = {0xFF, 0x01, 0x88, 0x07, 0xD0, 0x00, 0x00, 0x00, 0xA0};
     char cmd_5K[9] = {oxFF, 0x01, 0x88, 0x13, 0x88, 0x00, 0x00, 0x00, 0xDC};
@@ -379,10 +379,10 @@ void MHZ::calibrateSpan(int range)
 
     switch(range)
     {
-        case MHZ::RANGE_2K:
+        case MHZSensor::RANGE_2K:
             _serial->write(cmd_2K,9);
             break;
-        case MHZ::RANGE_5K:
+        case MHZSensor::RANGE_5K:
             _serial->write(cmd_5K,9);
             break;
         case 10000:

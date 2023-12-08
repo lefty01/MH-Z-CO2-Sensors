@@ -14,7 +14,7 @@
 #include <SoftwareSerial.h>
 #include <limits.h>
 
-class MHZ {
+class MHZSensor {
  public:
   enum SensorType { MHZ14A, MHZ14B, MHZ16, MHZ1911A, MHZ19B, MHZ19C, MHZ19D, MHZ19E };
 
@@ -29,11 +29,11 @@ class MHZ {
 
   enum MeasuringRange { RANGE_2K = 2000, RANGE_5K = 5000, RANGE_10K = 10000, RANGE_50K = 50000 };
 
-  MHZ(uint8_t rxpin, uint8_t txpin, uint8_t pwmpin, SensorType type, MeasuringRange range = RANGE_5K);
-  MHZ(uint8_t rxpin, uint8_t txpin, SensorType type);
-  MHZ(uint8_t pwmpin, SensorType type, MeasuringRange range = RANGE_5K);
-  MHZ(Stream *serial, uint8_t pwmpin, SensorType type, MeasuringRange range = RANGE_5K);
-  MHZ(Stream *serial, SensorType type);
+  MHZSensor(uint8_t rxpin, uint8_t txpin, uint8_t pwmpin, SensorType type, MeasuringRange range = RANGE_5K);
+  MHZSensor(uint8_t rxpin, uint8_t txpin, SensorType type);
+  MHZSensor(uint8_t pwmpin, SensorType type, MeasuringRange range = RANGE_5K);
+  MHZSensor(Stream *serial, uint8_t pwmpin, SensorType type, MeasuringRange range = RANGE_5K);
+  MHZSensor(Stream *serial, SensorType type);
 
   void setDebug(boolean enable, Stream *console = &Serial);
 
